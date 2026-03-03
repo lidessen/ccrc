@@ -1,0 +1,20 @@
+[project]
+name = "ccrc"
+version = "0.1.0"
+description = "Claude Remote Control session manager"
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = [
+    "click>=8.3.1",
+    "questionary>=2.1.0",
+]
+
+[project.scripts]
+ccrc = "cli:cli"
+
+[tool.hatch.build]
+only-include = ["cli.py"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
