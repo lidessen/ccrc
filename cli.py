@@ -161,6 +161,9 @@ def start_session(directory: str, name: str | None = None, *, no_sandbox: bool =
         cmd.append("--no-sandbox")
     else:
         cmd.append("--sandbox")
+        settings_file = Path(__file__).parent / "sandbox-settings.json"
+        if settings_file.exists():
+            cmd.extend(["--settings", str(settings_file)])
 
     with open(log_file, "w") as log:
         proc = subprocess.Popen(

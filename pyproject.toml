@@ -14,7 +14,7 @@ dependencies = [
 ccrc = "cli:cli"
 
 [tool.hatch.build]
-only-include = ["cli.py", "bot.py"]
+only-include = ["cli.py", "bot.py", "sandbox-settings.json"]
 
 [build-system]
 requires = ["hatchling"]

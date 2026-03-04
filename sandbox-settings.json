@@ -1,0 +1,19 @@
+{
+  "sandbox": {
+    "enabled": true,
+    "autoAllowBashIfSandboxed": true,
+    "excludedCommands": ["docker"],
+    "filesystem": {
+      "allowWrite": [
+        "//tmp",
+        "~/.npm",
+        "~/.cache",
+        "~/.config/gh",
+        "~/.local"
+      ]
+    },
+    "network": {
+      "allowedDomains": ["*"]
+    }
+  }
+}
