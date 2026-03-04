@@ -359,7 +359,7 @@ def _generate_plist() -> str:
         raise click.ClickException("'ccrc' command not found in PATH")
 
     env_vars = {}
-    for key in ("TELEGRAM_BOT_TOKEN", "TELEGRAM_CHAT_ID", "CCRC_WORKSPACES"):
+    for key in ("TELEGRAM_BOT_TOKEN", "TELEGRAM_CHAT_ID", "CCRC_WORKSPACES", "NO_PROXY"):
         val = os.environ.get(key)
         if val:
             env_vars[key] = val
