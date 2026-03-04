@@ -176,6 +176,23 @@ def start_session(directory: str, name: str | None = None, *, no_sandbox: bool =
         if settings_file.exists():
             cmd.extend(["--settings", str(settings_file)])
 
+    # Ensure child process has a rich PATH so tools like bun/node are available
+    # inside the sandbox (non-interactive shells don't source .zshrc/.zprofile).
+    env = os.environ.copy()
+    default_paths = [
+        "/opt/homebrew/bin", "/opt/homebrew/sbin",
+        "/usr/local/bin", "/usr/bin", "/bin", "/usr/sbin", "/sbin",
+    ]
+    home = Path.home()
+    extra_paths = [
+        str(home / ".bun" / "bin"),
+        str(home / ".local" / "bin"),
+    ]
+    # Also pick up any mise/fnm/nvm managed paths already in PATH
+    current = env.get("PATH", "").split(":")
+    merged = list(dict.fromkeys(current + extra_paths + default_paths))
+    env["PATH"] = ":".join(p for p in merged if p)
+
     with open(log_file, "w") as log:
         proc = subprocess.Popen(
             cmd,
@@ -184,6 +201,7 @@ def start_session(directory: str, name: str | None = None, *, no_sandbox: bool =
             stdout=log,
             stderr=log,
             start_new_session=True,
+            env=env,
         )
 
     session = Session(
@@ -198,8 +216,10 @@ def start_session(directory: str, name: str | None = None, *, no_sandbox: bool =
 
 def stop_session(session: Session, timeout: float = 5.0) -> None:
     if session.is_alive():
+        # Kill the entire process group (start_new_session=True creates one)
+        pgid = session.pid
         try:
-            os.kill(session.pid, signal.SIGTERM)
+            os.killpg(pgid, signal.SIGTERM)
         except OSError:
             pass
         else:
@@ -208,7 +228,7 @@ def stop_session(session: Session, timeout: float = 5.0) -> None:
                 time.sleep(0.1)
             if session.is_alive():
                 try:
-                    os.kill(session.pid, signal.SIGKILL)
+                    os.killpg(pgid, signal.SIGKILL)
                 except OSError:
                     pass
     session.remove()
