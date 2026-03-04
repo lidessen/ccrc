@@ -114,6 +114,17 @@ _VALID_NAME = re.compile(r"^[a-zA-Z0-9_\-.]+$")
 _SESSION_URL_RE = re.compile(r"(https://\S+)")
 
 
+def get_session_url(session: Session) -> str | None:
+    """Read the session log file and extract the remote control URL."""
+    log_file = LOGS_DIR / f"{session.name}.log"
+    try:
+        content = log_file.read_text()
+    except OSError:
+        return None
+    m = _SESSION_URL_RE.search(content)
+    return m.group(1) if m else None
+
+
 def wait_for_session_url(session: Session, timeout: float = 30.0) -> str | None:
     """Poll the session log file for the remote control URL."""
     log_file = LOGS_DIR / f"{session.name}.log"
@@ -358,7 +369,7 @@ def _generate_plist() -> str:
     if ccrc_path is None:
         raise click.ClickException("'ccrc' command not found in PATH")
 
-    env_vars = {}
+    env_vars = {"PATH": os.environ.get("PATH", "/usr/bin:/bin:/usr/sbin:/sbin")}
     for key in ("TELEGRAM_BOT_TOKEN", "TELEGRAM_CHAT_ID", "CCRC_WORKSPACES", "NO_PROXY"):
         val = os.environ.get(key)
         if val:
