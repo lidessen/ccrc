@@ -3,17 +3,18 @@ name = "ccrc"
 version = "0.1.0"
 description = "Claude Remote Control session manager"
 readme = "README.md"
-requires-python = ">=3.14"
+requires-python = ">=3.12"
 dependencies = [
     "click>=8.3.1",
     "questionary>=2.1.0",
+    "python-telegram-bot>=21.0",
 ]
 
 [project.scripts]
 ccrc = "cli:cli"
 
 [tool.hatch.build]
-only-include = ["cli.py"]
+only-include = ["cli.py", "bot.py"]
 
 [build-system]
 requires = ["hatchling"]
